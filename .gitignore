@@ -4,3 +4,7 @@ data/*
 output/*
 *.jpg
 *.png
+.DS_Store
+.idea/
+code/output/
+code/venv/
