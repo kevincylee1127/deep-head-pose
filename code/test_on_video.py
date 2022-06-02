@@ -34,6 +34,9 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
+    args.snapshot = '../snapshot/hopenet_alpha1.pkl'
+    args.video_path = '../data/LuoScanParkingLot.mp4'
+
     cudnn.enabled = True
 
     batch_size = 1
@@ -51,12 +54,12 @@ if __name__ == '__main__':
     # ResNet50 structure
     model = hopenet.Hopenet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 66)
 
-    print 'Loading snapshot.'
+    print('Loading snapshot.')
     # Load snapshot
     saved_state_dict = torch.load(snapshot_path)
     model.load_state_dict(saved_state_dict)
 
-    print 'Loading data.'
+    print('Loading data.')
 
     transformations = transforms.Compose([transforms.Scale(224),
     transforms.CenterCrop(224), transforms.ToTensor(),
@@ -64,13 +67,13 @@ if __name__ == '__main__':
 
     model.cuda(gpu)
 
-    print 'Ready to test network.'
+    print('Ready to test network.')
 
     # Test the Model
     model.eval()  # Change model to 'eval' mode (BN uses moving mean/var).
     total = 0
 
-    idx_tensor = [idx for idx in xrange(66)]
+    idx_tensor = [idx for idx in range(66)]
     idx_tensor = torch.FloatTensor(idx_tensor).cuda(gpu)
 
     video = cv2.VideoCapture(video_path)
@@ -105,7 +108,7 @@ if __name__ == '__main__':
         line = line.split(' ')
         det_frame_num = int(line[0])
 
-        print frame_num
+        print(frame_num)
 
         # Stop at a certain frame number
         if frame_num > args.n_frames:
@@ -189,3 +192,4 @@ if __name__ == '__main__':
     out.release()
     video.release()
     txt_out.close()
+

@@ -55,7 +55,7 @@ def get_ignored_params(model):
 def get_non_ignored_params(model):
     # Generator function that yields params that will be optimized.
     b = []
-    for idx in xrange(3, len(model.features)):
+    for idx in range(3, len(model.features)):
         b.append(model.features[idx])
     for layer in model.classifier:
         b.append(layer)
@@ -76,7 +76,7 @@ def get_fc_params(model):
 def load_filtered_state_dict(model, snapshot):
     # By user apaszke from discuss.pytorch.org
     model_dict = model.state_dict()
-    snapshot = {k: v for k, v in snapshot.items() if k in model_dict}
+    snapshot = {k: v for k, v in list(snapshot.items()) if k in model_dict}
     model_dict.update(snapshot)
     model.load_state_dict(model_dict)
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     model = hopenet.AlexNet(66)
     load_filtered_state_dict(model, model_zoo.load_url(model_urls['alexnet']))
 
-    print 'Loading data.'
+    print('Loading data.')
 
     transformations = transforms.Compose([transforms.Scale(240),
     transforms.RandomCrop(224), transforms.ToTensor(),
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     elif args.dataset == 'AFW':
         pose_dataset = datasets.AFW(args.data_dir, args.filename_list, transformations)
     else:
-        print 'Error: not a valid dataset name'
+        print('Error: not a valid dataset name')
         sys.exit()
     train_loader = torch.utils.data.DataLoader(dataset=pose_dataset,
                                                batch_size=batch_size,
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     # Regression loss coefficient
     alpha = args.alpha
 
-    idx_tensor = [idx for idx in xrange(66)]
+    idx_tensor = [idx for idx in range(66)]
     idx_tensor = Variable(torch.FloatTensor(idx_tensor)).cuda(gpu)
 
     optimizer = torch.optim.Adam([{'params': get_ignored_params(model), 'lr': 0},
@@ -137,7 +137,7 @@ if __name__ == '__main__':
                                   {'params': get_fc_params(model), 'lr': args.lr * 5}],
                                    lr = args.lr)
 
-    print 'Ready to train network.'
+    print('Ready to train network.')
     for epoch in range(num_epochs):
         for i, (images, labels, cont_labels, name) in enumerate(train_loader):
             images = Variable(images).cuda(gpu)
@@ -184,11 +184,12 @@ if __name__ == '__main__':
             optimizer.step()
 
             if (i+1) % 100 == 0:
-                print ('Epoch [%d/%d], Iter [%d/%d] Losses: Yaw %.4f, Pitch %.4f, Roll %.4f'
-                       %(epoch+1, num_epochs, i+1, len(pose_dataset)//batch_size, loss_yaw.data[0], loss_pitch.data[0], loss_roll.data[0]))
+                print(('Epoch [%d/%d], Iter [%d/%d] Losses: Yaw %.4f, Pitch %.4f, Roll %.4f'
+                       %(epoch+1, num_epochs, i+1, len(pose_dataset)//batch_size, loss_yaw.data[0], loss_pitch.data[0], loss_roll.data[0])))
 
         # Save models at numbered epochs.
         if epoch % 1 == 0 and epoch < num_epochs:
-            print 'Taking snapshot...'
+            print('Taking snapshot...')
             torch.save(model.state_dict(),
             'output/snapshots/' + args.output_string + '_epoch_'+ str(epoch+1) + '.pkl')
+

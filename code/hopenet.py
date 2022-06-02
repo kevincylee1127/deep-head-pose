@@ -169,3 +169,4 @@ class AlexNet(nn.Module):
         pitch = self.fc_pitch(x)
         roll = self.fc_roll(x)
         return yaw, pitch, roll
+
